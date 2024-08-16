@@ -1,0 +1,14 @@
+{{ if .Products }}
+    <ul>
+        {{ range .Products }}
+            <li>
+                <img src="{{ .ImageURL }}" alt="{{ .Name }}" style="width:100px;height:100px;">
+                <h2>{{ .Name }}</h2>
+                <p>{{ .Description }}</p>
+                <strong>${{ .Price }}</strong>
+            </li>
+        {{ end }}
+    </ul>
+{{ else }}
+    <p>No se encontraron productos.</p>
+{{ end }}
