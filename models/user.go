@@ -25,3 +25,14 @@ func GetUserByUsername(db *sql.DB, username string) (*User, error) {
 	}
 	return user, nil
 }
+
+// InsertUser inserta un nuevo usuario en la base de datos.
+func InsertUser(db *sql.DB, username string, hashedPassword []byte) error {
+	query := "INSERT INTO users (username, password) VALUES ($1, $2)"
+	_, err := db.Exec(query, username, string(hashedPassword))
+	if err != nil {
+		log.Println("Error al insertar el usuario en la base de datos:", err)
+		return err
+	}
+	return nil
+}

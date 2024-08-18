@@ -4,6 +4,7 @@ import (
 	"ecommerce/database"
 	"ecommerce/models"
 	"html/template"
+	"log"
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
@@ -50,6 +51,64 @@ func LoginHandler() http.HandlerFunc {
 		tmpl.ExecuteTemplate(w, "message", &Message{
 			Type:    "success",
 			Content: "Inicio de sesión exitoso. Bienvenido, " + template.HTMLEscapeString(username) + "!",
+		})
+	}
+}
+
+// RegisterHandler maneja la lógica de registro.
+func RegisterHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		if r.Method == http.MethodGet {
+			tmpl := template.Must(template.ParseFiles("templates/register.html"))
+			tmpl.Execute(w, nil)
+			return
+		}
+
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+
+		// Verificar si el usuario ya existe
+		user, err := models.GetUserByUsername(database.DB, username)
+		tmpl := template.Must(template.ParseFiles("templates/message.html"))
+
+		if err == nil && user != nil {
+
+			log.Println(user)
+			log.Print(err)
+
+			// Usuario ya existe
+			tmpl.ExecuteTemplate(w, "message", &Message{
+				Type:    "error",
+				Content: "El nombre de usuario ya está registrado",
+			})
+			return
+		}
+
+		// Hashear la contraseña
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			tmpl.Execute(w, &Message{
+				Type:    "error",
+				Content: "Error al crear el usuario. Inténtalo de nuevo.",
+			})
+			return
+		}
+
+		// Crear el nuevo usuario utilizando la función InsertUser
+		err = models.InsertUser(database.DB, username, hashedPassword)
+		if err != nil {
+			tmpl.Execute(w, &Message{
+				Type:    "error",
+				Content: "Error al registrar el usuario. Inténtalo de nuevo.",
+			})
+			return
+		}
+
+		// Registro exitoso
+		tmpl.Execute(w, &Message{
+			Type:    "success",
+			Content: "Registro completado exitosamente. Bienvenido, " + template.HTMLEscapeString(username) + "!",
 		})
 	}
 }

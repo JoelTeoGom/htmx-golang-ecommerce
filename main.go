@@ -19,6 +19,7 @@ func main() {
 	// Configuración de rutas
 	http.HandleFunc("/", handlers.LoginPage)
 	http.HandleFunc("/login", handlers.LoginHandler())
+	http.HandleFunc("/register", handlers.RegisterHandler())
 
 	// Inicio del servidor
 	log.Println("Servidor iniciado en :8080")
