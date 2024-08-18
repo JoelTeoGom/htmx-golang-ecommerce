@@ -17,9 +17,12 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fileServer))
 
 	// Configuración de rutas
-	http.HandleFunc("/", handlers.LoginPage)
-	http.HandleFunc("/login", handlers.LoginHandler())
-	http.HandleFunc("/register", handlers.RegisterHandler())
+
+	// Configuración de rutas con middleware de autenticación
+	http.HandleFunc("/", handlers.AuthMiddleware(handlers.HomeHandler()))
+	http.HandleFunc("/register", handlers.AuthMiddleware(handlers.RegisterHandler()))
+	http.HandleFunc("/login", handlers.AuthMiddleware(handlers.LoginHandler()))
+	http.HandleFunc("/logout", handlers.LogoutHandler())
 
 	// Inicio del servidor
 	log.Println("Servidor iniciado en :8080")
