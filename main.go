@@ -3,6 +3,7 @@ package main
 import (
 	"ecommerce/database"
 	"ecommerce/handlers"
+	"ecommerce/middleware"
 	"log"
 	"net/http"
 )
@@ -18,10 +19,10 @@ func main() {
 
 	// Configuración de rutas
 
-	// Configuración de rutas con middleware de autenticación
-	http.HandleFunc("/", handlers.AuthMiddleware(handlers.HomeHandler()))
-	http.HandleFunc("/register", handlers.AuthMiddleware(handlers.RegisterHandler()))
-	http.HandleFunc("/login", handlers.AuthMiddleware(handlers.LoginHandler()))
+	// Aplicar el middleware a las rutas protegidas
+	http.HandleFunc("/login", middleware.AuthMiddleware(handlers.LoginHandler()))
+	http.HandleFunc("/register", middleware.AuthMiddleware(handlers.RegisterHandler()))
+	http.HandleFunc("/", handlers.HomeHandler())
 	http.HandleFunc("/logout", handlers.LogoutHandler())
 
 	// Inicio del servidor

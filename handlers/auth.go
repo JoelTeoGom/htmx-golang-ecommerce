@@ -52,6 +52,7 @@ func setTokenCookie(w http.ResponseWriter, token string) {
 
 func RegisterHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		if r.Method == http.MethodGet {
 			tmpl := template.Must(template.ParseFiles("templates/register.html"))
 			tmpl.Execute(w, nil)
@@ -67,7 +68,7 @@ func RegisterHandler() http.HandlerFunc {
 
 		if err == nil && user != nil {
 			// Usuario ya existe
-			tmpl.Execute(w, &Message{
+			tmpl.ExecuteTemplate(w, "message", &Message{
 				Type:    "error",
 				Content: "El nombre de usuario ya está registrado",
 			})
@@ -77,7 +78,7 @@ func RegisterHandler() http.HandlerFunc {
 		// Hashear la contraseña
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
-			tmpl.Execute(w, &Message{
+			tmpl.ExecuteTemplate(w, "message", &Message{
 				Type:    "error",
 				Content: "Error al crear el usuario. Inténtalo de nuevo.",
 			})
@@ -87,14 +88,14 @@ func RegisterHandler() http.HandlerFunc {
 		// Crear el nuevo usuario
 		err = models.InsertUser(database.DB, username, hashedPassword)
 		if err != nil {
-			tmpl.Execute(w, &Message{
+			tmpl.ExecuteTemplate(w, "message", &Message{
 				Type:    "error",
 				Content: "Error al registrar el usuario. Inténtalo de nuevo.",
 			})
 			return
 		}
+		w.Header().Set("HX-Location", "/login")
 
-		http.Redirect(w, r, "/login", http.StatusFound)
 	}
 }
 
@@ -114,7 +115,7 @@ func LoginHandler() http.HandlerFunc {
 
 		user, err := models.GetUserByUsername(database.DB, username)
 		if err != nil || user == nil {
-			tmpl.Execute(w, &Message{
+			tmpl.ExecuteTemplate(w, "message", &Message{
 				Type:    "error",
 				Content: "Nombre de usuario incorrecto",
 			})
@@ -124,7 +125,7 @@ func LoginHandler() http.HandlerFunc {
 		// Verificar la contraseña con bcrypt
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 		if err != nil {
-			tmpl.Execute(w, &Message{
+			tmpl.ExecuteTemplate(w, "message", &Message{
 				Type:    "error",
 				Content: "Contraseña incorrecta",
 			})
@@ -134,7 +135,7 @@ func LoginHandler() http.HandlerFunc {
 		// Generar el token JWT
 		token, err := generateToken(user.ID, user.Username)
 		if err != nil {
-			tmpl.Execute(w, &Message{
+			tmpl.ExecuteTemplate(w, "message", &Message{
 				Type:    "error",
 				Content: "Error al generar la sesión. Inténtalo de nuevo.",
 			})
@@ -144,41 +145,14 @@ func LoginHandler() http.HandlerFunc {
 		// Configurar la cookie con el token
 		setTokenCookie(w, token)
 
-		// Inicio de sesión exitoso
-		tmpl.Execute(w, &Message{
-			Type:    "success",
-			Content: "Inicio de sesión exitoso. Bienvenido, " + template.HTMLEscapeString(username) + "!",
-		})
+		w.Header().Set("HX-Location", "/")
 	}
 }
 
-func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Verificar si la cookie de token existe
-		cookie, err := r.Cookie("token")
-		if err != nil {
-			// Si no hay cookie, redirigir a login
-			http.Redirect(w, r, "/login", http.StatusFound)
-			return
-		}
-
-		// Verificar el token JWT
-		token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
-			return jwtKey, nil
-		})
-		if err == nil && token.Valid {
-			// Si el token es válido, redirigir a la página principal
-			http.Redirect(w, r, "/", http.StatusFound)
-			return
-		}
-
-		// Si el token es inválido, redirigir a login
-		http.Redirect(w, r, "/login", http.StatusFound)
-	}
-}
-
+// LogoutHandler maneja la lógica de cierre de sesión
 func LogoutHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Crear una cookie con la misma configuración pero con una fecha de expiración en el pasado
 		cookie := &http.Cookie{
 			Name:     "token",
 			Value:    "",
@@ -186,12 +160,13 @@ func LogoutHandler() http.HandlerFunc {
 			Secure:   os.Getenv("NODE_ENV") == "production",
 			SameSite: http.SameSiteStrictMode,
 			Path:     "/",
-			Expires:  time.Now(),
+			Expires:  time.Unix(0, 0), // Expiración en el pasado
 		}
 
+		// Establecer la cookie en la respuesta para que sea eliminada del navegador
 		http.SetCookie(w, cookie)
 
-		// Redirigir al login
-		http.Redirect(w, r, "/login", http.StatusFound)
+		// Redirigir al usuario a la página de login después de cerrar sesión
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	}
 }

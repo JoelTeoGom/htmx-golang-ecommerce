@@ -1,3 +1,43 @@
-<h1>
-    hola main
-</h1>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Principal</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header>
+        <div style="float: right;">
+            {{if .IsAuthenticated}}
+                <p>Bienvenido, {{.Username}}</p>
+                <a href="/logout"><button>Cerrar Sesión</button></a>
+            {{else}}
+                <a href="/login"><button>Iniciar Sesión</button></a>
+            {{end}}
+        </div>
+        <h1>Página Principal</h1>
+    </header>
+    
+    <main>
+        <div class="w-screen min-h-screen bg-slate-950 px-6 py-10" hx-ext="client-side-templates">
+            <div class="mb-5 max-w-xl mx-auto">
+                <label for="base-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Busca tu película favorita</label>
+                <input 
+                    hx-post="http://localhost:8787/movies" 
+                    hx-trigger="input changed delay:500ms" 
+                    hx-target="#results" 
+                    hx-swap="innerHTML transition:true" 
+                    name="search" 
+                    mustache-template="template-results" 
+                    type="search" 
+                    id="base-input" 
+                    placeholder="Avengers, The Matrix, ..." 
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                />
+            </div>
+        </div>
+        
+    </main>
+</body>
+</html>
