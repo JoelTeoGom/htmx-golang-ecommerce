@@ -1,3 +1,61 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2 8h12l2-8M7 13H3.4M12 6h.01M15 6h.01M6 6h.01" />
-  </svg>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce - Carrito de Compras</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <header class="text-center py-5">
+        <div class="header-content max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Tu Carrito</h1>
+            <div class="user-actions">
+                {{if .IsAuthenticated}}
+                    <p>Bienvenido, {{.Username}}</p>
+                    <a href="/logout"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Cerrar Sesión</button></a>
+                {{else}}
+                    <a href="/login"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Iniciar Sesión</button></a>
+                {{end}}
+            </div>
+        </div>
+    </header>
+    
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <h2 class="text-2xl font-semibold mb-6">Resumen del Carrito</h2>
+        <div id="cart-items" class="space-y-6">
+            {{range .CartItems}}
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="w-24 h-24 object-cover rounded-lg">
+                    <div>
+                        <p class="text-xl font-semibold text-white">{{.Product.Name}}</p>
+                        <p class="text-lg text-gray-300">{{.Quantity}} x {{.Product.Price | printf "$%.2f"}}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <p class="text-xl font-semibold text-white">{{mul .Product.Price .Quantity | printf "$%.2f"}}</p>
+                    <button 
+                        hx-post="/cart/remove" 
+                        hx-vals='{"id": {{.ProductID}} }' 
+                        hx-target="#cart-items" 
+                        hx-swap="outerHTML"
+                        class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                    >
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+            {{else}}
+            <p class="text-lg text-gray-300">Tu carrito está vacío.</p>
+            {{end}}
+        </div>
+        
+        <div class="mt-10">
+            <h3 class="text-2xl font-semibold mb-4">Total: <span id="cart-total">{{.Total | printf "$%.2f"}}</span></h3>
+            <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">Proceder al Pago</button>
+        </div>
+    </main>
+</body>
+</html>

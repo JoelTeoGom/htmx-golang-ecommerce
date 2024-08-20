@@ -36,3 +36,17 @@ func InsertUser(db *sql.DB, username string, hashedPassword []byte) error {
 	}
 	return nil
 }
+
+func GetUserById(db *sql.DB, id int) (*User, error) {
+	query := "SELECT id, username, password FROM users WHERE id=$1"
+	user := &User{}
+	err := db.QueryRow(query, id).Scan(&user.ID, &user.Username, &user.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // Usuario no encontrado
+		}
+		log.Println("Error al consultar la base de datos:", err)
+		return nil, err
+	}
+	return user, nil
+}

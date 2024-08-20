@@ -39,11 +39,16 @@ func GetUserIDFromCookie(r *http.Request) (int, error) {
 	return int(userID), nil
 }
 
+// Función para multiplicar dos valores
+func mul(a, b float64) float64 {
+	return a * b
+}
+
 func CartHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID, err := GetUserIDFromCookie(r)
 		if err != nil || userID == 0 {
-			http.Error(w, "No se pudo obtener el usuario de la sesión", http.StatusUnauthorized)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 
@@ -53,8 +58,37 @@ func CartHandler() http.HandlerFunc {
 			return
 		}
 
-		tmpl := template.Must(template.ParseFiles("templates/_cart.html"))
-		tmpl.Execute(w, cartItems)
+		user, err := models.GetUserById(database.DB, userID)
+		if err != nil {
+			http.Error(w, "Error al obtener el user", http.StatusInternalServerError)
+			return
+		}
+
+		username := user.Username
+		var total float64
+		for _, item := range cartItems {
+			total += item.Product.Price * float64(item.Quantity)
+		}
+
+		data := struct {
+			IsAuthenticated bool
+			Username        string
+			CartItems       []models.Cart
+			Total           float64
+		}{
+			Username:        username,
+			CartItems:       cartItems,
+			Total:           total,
+			IsAuthenticated: true,
+		}
+
+		// Funciones personalizadas para el template
+		funcMap := template.FuncMap{
+			"mul": mul,
+		}
+
+		tmpl := template.Must(template.New("cart.html").Funcs(funcMap).ParseFiles("templates/cart.html"))
+		tmpl.Execute(w, data)
 	}
 }
 

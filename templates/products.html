@@ -8,13 +8,16 @@
             <p class="text-lg text-gray-300">{{.Price | printf "$%.2f"}}</p>
         </a>
 
-
-        <div class="absolute bottom-2.5 right-2.5 bg-green-500 text-white p-2 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V5a4 4 0 00-8 0v6M5 11h14l1.38 9.69A2 2 0 0118.42 23H5.58a2 2 0 01-1.96-2.31L5 11z" />
-            </svg>
-        </div>
-        
+        <button 
+        hx-post="/cart/add" 
+        hx-vals='{"id": {{.ID}} }' 
+        hx-trigger="click" 
+        class="absolute bottom-2.5 right-2.5 bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition"
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V5a4 4 0 00-8 0v6M5 11h14l1.38 9.69A2 2 0 0118.42 23H5.58a2 2 0 01-1.96-2.31L5 11z" />
+        </svg>
+    </button>
 
     </li>
     {{end}}
