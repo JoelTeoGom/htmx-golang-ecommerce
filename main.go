@@ -25,6 +25,12 @@ func main() {
 	http.HandleFunc("/", handlers.HomeHandler())
 	http.HandleFunc("/logout", handlers.LogoutHandler())
 
+	// Rutas para productos
+	http.HandleFunc("/products", handlers.ProductListHandler())
+	http.HandleFunc("/products/search", handlers.ProductSearchHandler())
+	http.HandleFunc("/product", handlers.ProductDetailHandler())
+	http.HandleFunc("/product/create", handlers.ProductCreateHandler())
+
 	// Inicio del servidor
 	log.Println("Servidor iniciado en :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

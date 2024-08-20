@@ -3,41 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <title>Ecommerce - Productos Electrónicos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
 </head>
-<body>
-    <header>
-        <div style="float: right;">
-            {{if .IsAuthenticated}}
-                <p>Bienvenido, {{.Username}}</p>
-                <a href="/logout"><button>Cerrar Sesión</button></a>
-            {{else}}
-                <a href="/login"><button>Iniciar Sesión</button></a>
-            {{end}}
-        </div>
-        <h1>Página Principal</h1>
-    </header>
-    
-    <main>
-        <div class="w-screen min-h-screen bg-slate-950 px-6 py-10" hx-ext="client-side-templates">
-            <div class="mb-5 max-w-xl mx-auto">
-                <label for="base-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Busca tu película favorita</label>
-                <input 
-                    hx-post="http://localhost:8787/movies" 
-                    hx-trigger="input changed delay:500ms" 
-                    hx-target="#results" 
-                    hx-swap="innerHTML transition:true" 
-                    name="search" 
-                    mustache-template="template-results" 
-                    type="search" 
-                    id="base-input" 
-                    placeholder="Avengers, The Matrix, ..." 
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                />
+<body class="bg-gray-900 text-white">
+    <header class="text-center py-5">
+        <div class="header-content max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-bold">Ecommerce</h1>
+            <div class="user-actions">
+                {{if .IsAuthenticated}}
+                    <p>Bienvenido, {{.Username}}</p>
+                    <a href="/logout"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Sign Out</button></a>
+                {{else}}
+                    <a href="/login"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Sign In</button></a>
+                {{end}}
             </div>
         </div>
+    </header>
+    
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <div class="search-bar mb-6">
+            <input 
+                hx-get="/products/search" 
+                hx-trigger="input changed delay:500ms" 
+                hx-target="#product-list" 
+                hx-swap="innerHTML transition:true"  
+                name="search" 
+                type="search" 
+                id="search-input" 
+                placeholder="Buscar productos electrónicos..." 
+                class="search-input w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700 focus:outline-none focus:border-green-500"
+            />
+        </div>
         
+        
+        <div id="product-list" class="product-grid" hx-get="/products" hx-trigger="load" hx-swap="innerHTML">
+            <!-- Aquí se cargarán los productos dinámicamente -->
+        </div>
     </main>
 </body>
 </html>

@@ -1,0 +1,22 @@
+{{define "products"}}
+<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {{range .}}
+    <li class="bg-gray-800 rounded-lg shadow-lg p-4 transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl">
+        <a href="/product?id={{.ID}}">
+            <img src="{{.ImageURL}}" alt="{{.Name}}" class="w-full h-48 object-cover rounded-t-lg">
+            <p class="mt-4 text-xl font-semibold text-white">{{.Name}}</p>
+            <p class="text-lg text-gray-300">{{.Price | printf "$%.2f"}}</p>
+        </a>
+
+
+        <div class="absolute bottom-2.5 right-2.5 bg-green-500 text-white p-2 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V5a4 4 0 00-8 0v6M5 11h14l1.38 9.69A2 2 0 0118.42 23H5.58a2 2 0 01-1.96-2.31L5 11z" />
+            </svg>
+        </div>
+        
+
+    </li>
+    {{end}}
+</ul>
+{{end}}
