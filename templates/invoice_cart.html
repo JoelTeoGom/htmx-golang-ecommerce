@@ -1,0 +1,109 @@
+<div id="invoice-container">
+    <style>
+        body {
+            background-color: #1a202c; /* Keeping the body background color to black */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e2e8f0; /* Slightly darker text color */
+        }
+
+        .invoice-container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+            border: 2px solid #2c5282;
+        }
+
+        .invoice-header h1 {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c5282;
+        }
+
+        .invoice-info p {
+            margin: 5px 0;
+            font-size: 18px;
+            color: #4a5568; /* Slightly darker gray for invoice information */
+        }
+
+        .invoice-table th {
+            background-color: #2c5282;
+            color: #edf2f7; /* Slightly off-white text color */
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .invoice-table tbody tr {
+            background-color: #edf2f7;
+            border-radius: 10px;
+        }
+
+        .invoice-table tbody tr td {
+            color: #4a5568; /* Slightly darker text color */
+        }
+
+        .invoice-total {
+            text-align: right;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c5282;
+            margin-bottom: 10px;
+        }
+
+        .checkout-button {
+            display: inline-block;
+            padding: 15px 25px;
+            background-color: #2c5282;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .checkout-button:hover {
+            background-color: #2b6cb0;
+        }
+    </style>
+
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>Invoice Summary</h1>
+        </div>
+
+        <div class="invoice-info">
+            <p><strong>Invoice #{{.Invoice.ID}}</strong></p>
+            <p><strong>Date:</strong> {{.Invoice.CreatedAt.Format "January 2, 2006"}}</p>
+            <p><strong>User ID:</strong> {{.Invoice.UserID}}</p>
+        </div>
+
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Items}}
+                <tr>
+                    <td>{{.Product.Name}}</td>
+                    <td>{{.Quantity}}</td>
+                    <td>${{.Price}}</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+
+        <div class="invoice-total">
+            <p>Total: ${{.Invoice.Total}}</p>
+        </div>
+
+    </div>
+</div>

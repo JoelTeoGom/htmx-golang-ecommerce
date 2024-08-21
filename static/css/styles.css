@@ -103,3 +103,73 @@ button:hover {
     padding: 10px;
     background-color: #111827; /* bg-gray-900 */
 }
+
+
+
+/*invoice */
+
+
+.invoice-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #1a202c;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.invoice-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.invoice-header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+}
+.invoice-info, .invoice-total, .invoice-footer {
+    margin-bottom: 20px;
+}
+.invoice-info p {
+    margin: 0;
+    color: #a0aec0;
+}
+.invoice-total p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #48bb78;
+    text-align: right;
+}
+.invoice-table {
+    width: 100%;
+    margin-bottom: 20px;
+    color: #a0aec0;
+}
+.invoice-table th, .invoice-table td {
+    padding: 8px;
+    text-align: left;
+}
+.invoice-table th {
+    background-color: #2d3748;
+    color: #fff;
+}
+.invoice-table tbody tr:nth-child(even) {
+    background-color: #2d3748;
+}
+.product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+.invoice-footer {
+    text-align: center;
+    color: #a0aec0;
+    font-size: 14px;
+}
+.product-name {
+    display: flex;
+    align-items: center;
+}
+
+

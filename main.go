@@ -30,11 +30,17 @@ func main() {
 	http.HandleFunc("/products/search", handlers.ProductSearchHandler())
 	http.HandleFunc("/product", handlers.ProductDetailHandler())
 	http.HandleFunc("/product/create", handlers.ProductCreateHandler())
+	http.HandleFunc("/products/filter", handlers.ProductFilterHandler())
 
 	// Rutas para el carrito (protegidas por autenticación)
 	http.HandleFunc("/cart", middleware.AuthMiddleware(handlers.CartHandler()))
 	http.HandleFunc("/cart/add", middleware.AuthMiddleware(handlers.AddToCartHandler()))
 	http.HandleFunc("/cart/remove", middleware.AuthMiddleware(handlers.RemoveFromCartHandler()))
+
+	http.HandleFunc("/cart/checkout", middleware.AuthMiddleware(handlers.CheckoutCartHome()))
+	http.HandleFunc("/cart/checkoutHome", middleware.AuthMiddleware(handlers.CheckoutCartHome()))
+
+	http.HandleFunc("/cart/addHome", middleware.AuthMiddleware(handlers.AddToCartHomeHandler()))
 
 	// Inicio del servidor
 	log.Println("Servidor iniciado en :8080")

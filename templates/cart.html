@@ -1,64 +1,95 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecommerce - Carrito de Compras</title>
+    <title>Ecommerce - Shopping Cart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <script src="https://unpkg.com/htmx.org@1.8.4"></script>
 </head>
 <body class="bg-gray-900 text-white">
     <header class="text-center py-5">
         <div class="header-content max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-3xl font-bold">Tu Carrito</h1>
+            <a href="/" class="flex items-center space-x-3">
+                <!-- Home icon to return to the homepage -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M13 5v6a2 2 0 002 2h6m-2 10H5a2 2 0 01-2-2V10a2 2 0 012-2h3m7-1v7a2 2 0 01-2 2H9m0 4h6a2 2 0 002-2v-7m0 7h4" />
+                </svg>
+                <h1 class="text-3xl font-bold">Your Cart</h1>
+            </a>
             <div class="user-actions">
                 {{if .IsAuthenticated}}
-                    <p>Bienvenido, {{.Username}}</p>
-                    <a href="/logout"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Cerrar Sesión</button></a>
+                    <p>Welcome, {{.Username}}</p>
+                    <a href="/logout"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Sign Out</button></a>
                 {{else}}
-                    <a href="/login"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Iniciar Sesión</button></a>
+                    <a href="/login"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Sign In</button></a>
                 {{end}}
             </div>
         </div>
     </header>
     
-    <main class="max-w-7xl mx-auto px-4 py-6">
-        <h2 class="text-2xl font-semibold mb-6">Resumen del Carrito</h2>
-        <div id="cart-items" class="space-y-6">
-            {{range .CartItems}}
-            <div id="cart-item-{{.ProductID}}">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
-                        <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="w-24 h-24 object-cover rounded-lg">
-                        <div>
-                            <p class="text-xl font-semibold text-white">{{.Product.Name}}</p>
-                            <p class="text-lg text-gray-300">{{.Quantity}} x {{.Product.Price | printf "$%.2f"}}</p>
+        <main class="max-w-7xl mx-auto px-4 py-6">
+            <h2 class="text-2xl font-semibold mb-6">Cart Summary</h2>
+            <div id="cart-items" class="space-y-6">
+                {{range .CartItems}}
+                <div id="cart-item-{{.ProductID}}" data-price="{{.Product.Price}}" data-quantity="{{.Quantity}}">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="w-24 h-24 object-cover rounded-lg">
+                            <div>
+                                <p class="text-xl font-semibold text-white">{{.Product.Name}}</p>
+                                <p class="text-lg text-gray-300">{{.Quantity}} x {{.Product.Price | printf "$%.2f"}}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button 
+                                hx-post="/cart/remove" 
+                                hx-vals='{"id": {{.ProductID}} }' 
+                                hx-target="#cart-item-{{.ProductID}}" 
+                                hx-swap="delete" 
+                                hx-trigger="click"
+                                class="bg-red-600 text-white p-2 rounded-lg hover:bg-red-700"
+                                >
+                                <!-- Stylized trash icon, larger and black -->
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5-4h4m-4 0a2 2 0 00-2 2v1h8V5a2 2 0 00-2-2m-4 0h4" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <button 
-                            hx-delete="/cart/remove" 
-                            hx-vals='{"id": {{.ProductID}} }' 
-                            hx-target="#cart-item-{{.ProductID}}" 
-                            hx-swap="delete" 
-                            hx-trigger="click"
-                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-                           
-                        >
-                            Eliminar
-                        </button>
-                    </div>
                 </div>
+                {{else}}
+                <p class="text-lg text-gray-300">Your cart is empty.</p>
+                {{end}}
             </div>
-            {{else}}
-            <p class="text-lg text-gray-300">Tu carrito está vacío.</p>
-            {{end}}
-        </div>
-        
-        <div class="mt-10">
-            <h3 class="text-2xl font-semibold mb-4">Total: <span id="cart-total">{{.Total | printf "$%.2f"}}</span></h3>
-            <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600">Proceder al Pago</button>
-        </div>
-    </main>
+            
+            <div class="mt-10">
+                <h3 class="text-2xl font-semibold mb-4">Total: <span id="cart-total">{{.Total | printf "$%.2f"}}</span></h3>
+                <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
+                    hx-post="/cart/checkout"
+                    hx-target="#cart-items"
+                    hx-swap="innerHTML"
+                    hx-trigger="click"
+                >Proceed to Checkout</button>
+            </div>
+        </main>
+
+    <script>
+        // Function to recalculate the cart total
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('#cart-items > div[id^="cart-item-"]').forEach(function(item) {
+                let price = parseFloat(item.getAttribute('data-price'));
+                let quantity = parseInt(item.getAttribute('data-quantity'));
+                total += price * quantity;
+            });
+            document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Execute the function to recalculate the total after an HTMX request completes
+        document.body.addEventListener('htmx:afterRequest', function(event) {
+            calculateTotal();
+        });
+    </script>
 </body>
 </html>

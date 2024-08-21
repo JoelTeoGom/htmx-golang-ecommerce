@@ -1,30 +1,49 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ecommerce - Productos Electrónicos</title>
+    <title>Ecommerce - Electronic Products</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <link href="/static/css/styles.css" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@1.8.4"></script>
-
+    
 </head>
-<body class="bg-gray-900 text-white">
-    <header class="text-center py-5">
+<body class="bg-gray-900 text-white flex flex-col min-h-screen">
+    <header class="text-center py-5 border-b border-gray-700">
         <div class="header-content max-w-7xl mx-auto flex justify-between items-center">
             <h1 class="text-3xl font-bold">Ecommerce</h1>
-            <div class="user-actions">
+            <div class="user-actions flex items-center space-x-4">
                 {{if .IsAuthenticated}}
-                    <p>Bienvenido, {{.Username}}</p>
-                    <a href="/logout"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Sign Out</button></a>
+                    <a href="/cart" class="relative">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4L4 7M7 13l-1 5h11.6a2 2 0 002-2h-1a2 2 0 00-2-2H7zm-1 5a2 2 0 102 2 2 2 0 00-2-2zm10 0a2 2 0 102 2 2 2 0 00-2-2z"/>
+                        </svg>
+                    </a>
+                    <p>Welcome, {{.Username}}</p>
+                    <a href="/logout">
+                        <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg flex items-center space-x-2">
+                            <span>Sign Out</span>
+                        </button>
+                    </a>
                 {{else}}
                     <a href="/login"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Sign In</button></a>
                 {{end}}
             </div>
         </div>
     </header>
+
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 flex justify-center space-x-8 text-lg font-bold text-gray-300 tracking-wider">
+            <a href="#" hx-get="/products/filter?type=console" hx-target="#product-list" hx-swap="innerHTML transition:true" class="hover:text-white py-4">CONSOLES</a>
+            <a href="#" hx-get="/products/filter?type=TV" hx-target="#product-list" hx-swap="innerHTML transition:true" class="hover:text-white py-4">SMART TV</a>
+            <a href="#" hx-get="/products/filter?type=smartphone" hx-target="#product-list" hx-swap="innerHTML transition:true" class="hover:text-white py-4">SMARTPHONES</a>
+            <a href="#" hx-get="/products/filter?type=laptop" hx-target="#product-list" hx-swap="innerHTML transition:true" class="hover:text-white py-4">LAPTOPS</a>
+            <a href="#" hx-get="/products/filter?type=others" hx-target="#product-list" hx-swap="innerHTML transition:true" class="hover:text-white py-4">OTHERS</a>
+        </div>
+    </nav>
     
-    <main class="max-w-7xl mx-auto px-4 py-6">
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow">
         <div class="search-bar mb-6">
             <input 
                 hx-get="/products/search" 
@@ -34,45 +53,50 @@
                 name="search" 
                 type="search" 
                 id="search-input" 
-                placeholder="Buscar productos electrónicos..." 
+                placeholder="Search electronic products..." 
                 class="search-input w-full bg-gray-800 text-white p-3 rounded-lg border border-gray-700 focus:outline-none focus:border-green-500"
             />
         </div>
-        
+
         <div id="product-list" class="product-grid" hx-get="/products" hx-trigger="load" hx-swap="innerHTML">
-            <!-- Aquí se cargarán los productos dinámicamente -->
+            <!-- Products will be loaded dynamically here -->
         </div>
 
-        <!-- Panel deslizante para el carrito -->
+        <!-- Sliding panel for the cart -->
         <div id="cart-panel">
             <button class="close-btn" onclick="closeCart()">×</button>
             <div id="cart-items-panel" class="p-6">
-                <!-- Aquí se cargará el contenido del carrito -->
-            </div>
-            <div class="cart-footer">
-                <p>Total: <span id="cart-total">$0.00</span></p>
-                <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg w-full">Pay Now</button>
+                <!-- Cart content will be loaded here -->
             </div>
         </div>
         
     </main>
 
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-400 py-6 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-xl font-bold text-white mb-2">About Us</h2>
+            <p class="text-gray-300 mb-4">We are an ecommerce dedicated to offering the best electronic products at competitive prices. Our commitment is to provide the best shopping experience for our customers.</p>
+            <p class="text-gray-400 text-sm">© 2024 Ecommerce. All rights reserved.</p>
+        </div>
+    </footer>
+
     <script>
-        // Función para abrir el panel del carrito
+        // Function to open the cart panel
         function openCart() {
             document.getElementById('cart-panel').classList.add('open');
         }
 
-        // Función para cerrar el panel del carrito
+        // Function to close the cart panel
         function closeCart() {
             document.getElementById('cart-panel').classList.remove('open');
         }
 
-        // Event listener para agregar al carrito y abrir el panel
+        // Event listener to add to cart and open the panel
         document.addEventListener('htmx:afterRequest', function(evt) {
             if (evt.detail.target.id === 'cart-items-panel') {
-                openCart(); // Abrir el carrito al agregar un producto
-                // Aquí podrías actualizar el total u otros elementos del carrito
+                openCart(); // Open the cart when a product is added
+                // You can update the total or other elements of the cart here
             }
         });
     </script>

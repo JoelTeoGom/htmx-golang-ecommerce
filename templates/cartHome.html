@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce - Carrito de Compras</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="header-content max-w-7xl mx-auto flex justify-between items-center py-4">
+        <h1 class="text-2xl font-bold">Tu Carrito</h1>
+    </div>
+    
+    <div class="px-4 py-2">
+        <div id="cart-items" class="space-y-4">
+            {{range .CartItems}}
+            <div id="cart-item-{{.ProductID}}" class="flex items-center justify-between bg-gray-800 p-4 rounded-lg shadow-md" data-price="{{.Product.Price}}" data-quantity="{{.Quantity}}">
+                <div class="flex items-center space-x-4">
+                    <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="w-16 h-16 object-cover rounded-lg">
+                    <div>
+                        <p class="text-lg font-semibold text-white">{{.Product.Name}}</p>
+                        <p class="text-sm text-gray-300">{{.Quantity}} x {{.Product.Price | printf "$%.2f"}}</p>
+                    </div>
+                </div>
+                <button 
+                    hx-post="/cart/remove" 
+                    hx-vals='{"id": {{.ProductID}} }' 
+                    hx-target="#cart-item-{{.ProductID}}" 
+                    hx-swap="delete" 
+                    hx-trigger="click"
+                    class="bg-red-600 text-white p-1 rounded-lg hover:bg-red-700"
+                >
+                    <!-- Ícono de papelera más estilizado, más pequeño y en negro -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5-4h4m-4 0a2 2 0 00-2 2v1h8V5a2 2 0 00-2-2m-4 0h4" />
+                    </svg>
+                </button>
+            </div>
+            {{else}}
+            <p class="text-lg text-gray-300">Tu carrito está vacío.</p>
+            {{end}}
+        </div>
+        
+        <div class="mt-6">
+            <h3 class="text-xl font-semibold mb-2">Total: <span id="cart-total">{{.Total | printf "$%.2f"}}</span></h3>
+            <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 w-full"
+                hx-post="/cart/checkoutHome" 
+                hx-trigger="click"
+                hx-target="#cart-items-panel" 
+                hx-swap="innerHTML"
+            >Proceder al Pago</button>
+        </div>
+    </div>
+
+    <script>
+        // Función para recalcular el total del carrito
+        function calculateTotal() {
+            let total = 0;
+            document.querySelectorAll('#cart-items > div[id^="cart-item-"]').forEach(function(item) {
+                let price = parseFloat(item.getAttribute('data-price'));
+                let quantity = parseInt(item.getAttribute('data-quantity'));
+                total += price * quantity;
+            });
+            document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Ejecutar la función para recalcular el total después de que se complete una solicitud HTMX
+        document.body.addEventListener('htmx:afterRequest', function(event) {
+            calculateTotal();
+        });
+    </script>
+</body>
+</html>

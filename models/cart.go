@@ -1,6 +1,9 @@
 package models
 
-import "database/sql"
+import (
+	"database/sql"
+	"log"
+)
 
 type Cart struct {
 	ID        int
@@ -41,6 +44,7 @@ func GetCartItems(db *sql.DB, userID int) ([]Cart, error) {
 
 // Añadir un producto al carrito
 func AddToCart(db *sql.DB, userID int, productID int) error {
+
 	query := `
         INSERT INTO carts (user_id, product_id, quantity)
         VALUES ($1, $2, 1)
@@ -53,6 +57,8 @@ func AddToCart(db *sql.DB, userID int, productID int) error {
 
 // Eliminar un producto del carrito
 func RemoveFromCart(db *sql.DB, userID int, productID int) error {
+
+	log.Println(productID)
 	query := `
         DELETE FROM carts
         WHERE user_id = $1 AND product_id = $2

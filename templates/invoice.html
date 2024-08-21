@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice #{{.Invoice.ID}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h1>Invoice #{{.Invoice.ID}}</h1>
+        </div>
+
+        <div class="invoice-info">
+            <p><strong>Date:</strong> {{.Invoice.CreatedAt.Format "January 2, 2006"}}</p>
+            <p><strong>User ID:</strong> {{.Invoice.UserID}}</p>
+        </div>
+
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Image</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Items}}
+                <tr>
+                    <td class="product-name">{{.Product.Name}}</td>
+                    <td><img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="product-image"></td>
+                    <td>{{.Quantity}}</td>
+                    <td>${{.Price}}</td>
+                    <td class="item-total" data-price="{{.Price}}" data-quantity="{{.Quantity}}"></td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+
+        <div class="invoice-total">
+            <p>Total: $<span id="invoice-total">{{.Invoice.Total}}</span></p>
+        </div>
+
+        <div class="invoice-footer">
+            <p>Thank you for your purchase!</p>
+            <p>© 2024 Ecommerce. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // Function to calculate totals for each item and the grand total
+        function calculateInvoiceTotal() {
+            let grandTotal = 0;
+            document.querySelectorAll('.item-total').forEach(function(item) {
+                const price = parseFloat(item.getAttribute('data-price'));
+                const quantity = parseInt(item.getAttribute('data-quantity'));
+                const total = price * quantity;
+                item.textContent = `$${total.toFixed(2)}`;
+                grandTotal += total;
+            });
+            document.getElementById('invoice-total').textContent = grandTotal.toFixed(2);
+        }
+
+        // Call the function to calculate totals on page load
+        window.onload = calculateInvoiceTotal;
+    </script>
+</body>
+</html>

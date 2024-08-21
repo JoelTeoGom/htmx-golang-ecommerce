@@ -4,6 +4,7 @@ import (
 	"ecommerce/database"
 	"ecommerce/models"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -31,6 +32,24 @@ func ProductSearchHandler() http.HandlerFunc {
 			http.Error(w, "Error al buscar productos", http.StatusInternalServerError)
 			return
 		}
+
+		tmpl := template.Must(template.ParseFiles("templates/products.html"))
+		tmpl.ExecuteTemplate(w, "products", products)
+	}
+}
+
+func ProductFilterHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		productType := r.URL.Query().Get("type")
+		log.Println("Filtrando productos por tipo:", productType)
+
+		products, err := models.GetProductsByType(database.DB, productType)
+		if err != nil {
+			http.Error(w, "Error al buscar productos", http.StatusInternalServerError)
+			return
+		}
+
+		log.Println(products)
 
 		tmpl := template.Must(template.ParseFiles("templates/products.html"))
 		tmpl.ExecuteTemplate(w, "products", products)
