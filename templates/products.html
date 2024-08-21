@@ -8,10 +8,13 @@
             <p class="text-lg text-gray-300">{{.Price | printf "$%.2f"}}</p>
         </a>
 
-        <button 
+    <button 
         hx-post="/cart/add" 
         hx-vals='{"id": {{.ID}} }' 
         hx-trigger="click" 
+        hx-target="#cart-items-panel" 
+        hx-on="htmx:afterRequest: openCart()"
+        hx-swap="innerHTML"
         class="absolute bottom-2.5 right-2.5 bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition"
     >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

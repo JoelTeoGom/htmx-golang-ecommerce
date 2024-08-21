@@ -26,25 +26,28 @@
         <h2 class="text-2xl font-semibold mb-6">Resumen del Carrito</h2>
         <div id="cart-items" class="space-y-6">
             {{range .CartItems}}
-            <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="w-24 h-24 object-cover rounded-lg">
-                    <div>
-                        <p class="text-xl font-semibold text-white">{{.Product.Name}}</p>
-                        <p class="text-lg text-gray-300">{{.Quantity}} x {{.Product.Price | printf "$%.2f"}}</p>
+            <div id="cart-item-{{.ProductID}}">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="w-24 h-24 object-cover rounded-lg">
+                        <div>
+                            <p class="text-xl font-semibold text-white">{{.Product.Name}}</p>
+                            <p class="text-lg text-gray-300">{{.Quantity}} x {{.Product.Price | printf "$%.2f"}}</p>
+                        </div>
                     </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <p class="text-xl font-semibold text-white">{{mul .Product.Price .Quantity | printf "$%.2f"}}</p>
-                    <button 
-                        hx-post="/cart/remove" 
-                        hx-vals='{"id": {{.ProductID}} }' 
-                        hx-target="#cart-items" 
-                        hx-swap="outerHTML"
-                        class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-                    >
-                        Eliminar
-                    </button>
+                    <div class="flex items-center space-x-4">
+                        <button 
+                            hx-delete="/cart/remove" 
+                            hx-vals='{"id": {{.ProductID}} }' 
+                            hx-target="#cart-item-{{.ProductID}}" 
+                            hx-swap="delete" 
+                            hx-trigger="click"
+                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                           
+                        >
+                            Eliminar
+                        </button>
+                    </div>
                 </div>
             </div>
             {{else}}

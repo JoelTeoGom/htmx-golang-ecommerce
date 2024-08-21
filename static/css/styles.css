@@ -62,4 +62,44 @@ button:hover {
 
 
 
-/* home page*/
+/* Estilos para el panel deslizante del carrito */
+#cart-panel {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 350px;
+    height: 100%;
+    background-color: #1f2937; /* bg-gray-800 */
+    transition: right 0.3s ease;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+}
+
+#cart-panel.open {
+    right: 0;
+}
+
+/* Botón de cerrar */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+    background: none;
+    border: none;
+}
+
+/* Estilo del carrito */
+#cart-items-panel {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.cart-footer {
+    padding: 10px;
+    background-color: #111827; /* bg-gray-900 */
+}

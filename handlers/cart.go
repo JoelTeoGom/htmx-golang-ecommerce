@@ -4,6 +4,7 @@ import (
 	"ecommerce/database"
 	"ecommerce/models"
 	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -39,11 +40,6 @@ func GetUserIDFromCookie(r *http.Request) (int, error) {
 	return int(userID), nil
 }
 
-// Función para multiplicar dos valores
-func mul(a, b float64) float64 {
-	return a * b
-}
-
 func CartHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID, err := GetUserIDFromCookie(r)
@@ -57,6 +53,8 @@ func CartHandler() http.HandlerFunc {
 			http.Error(w, "Error al obtener el carrito", http.StatusInternalServerError)
 			return
 		}
+
+		log.Println(cartItems)
 
 		user, err := models.GetUserById(database.DB, userID)
 		if err != nil {
@@ -82,12 +80,7 @@ func CartHandler() http.HandlerFunc {
 			IsAuthenticated: true,
 		}
 
-		// Funciones personalizadas para el template
-		funcMap := template.FuncMap{
-			"mul": mul,
-		}
-
-		tmpl := template.Must(template.New("cart.html").Funcs(funcMap).ParseFiles("templates/cart.html"))
+		tmpl := template.Must(template.ParseFiles("templates/cart.html"))
 		tmpl.Execute(w, data)
 	}
 }
@@ -102,7 +95,9 @@ func AddToCartHandler() http.HandlerFunc {
 
 		productID, _ := strconv.Atoi(r.FormValue("id"))
 
+		log.Println(productID)
 		err = models.AddToCart(database.DB, userID, productID)
+
 		if err != nil {
 			http.Error(w, "No se pudo agregar el producto al carrito", http.StatusInternalServerError)
 			return
@@ -128,6 +123,5 @@ func RemoveFromCartHandler() http.HandlerFunc {
 			return
 		}
 
-		CartHandler().ServeHTTP(w, r) // Refrescar el carrito después de eliminar el producto
 	}
 }

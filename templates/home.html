@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ecommerce - Productos Electrónicos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <link href="/static/css/styles.css" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@1.8.4"></script>
+
 </head>
 <body class="bg-gray-900 text-white">
     <header class="text-center py-5">
@@ -37,10 +39,42 @@
             />
         </div>
         
-        
         <div id="product-list" class="product-grid" hx-get="/products" hx-trigger="load" hx-swap="innerHTML">
             <!-- Aquí se cargarán los productos dinámicamente -->
         </div>
+
+        <!-- Panel deslizante para el carrito -->
+        <div id="cart-panel">
+            <button class="close-btn" onclick="closeCart()">×</button>
+            <div id="cart-items-panel" class="p-6">
+                <!-- Aquí se cargará el contenido del carrito -->
+            </div>
+            <div class="cart-footer">
+                <p>Total: <span id="cart-total">$0.00</span></p>
+                <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg w-full">Pay Now</button>
+            </div>
+        </div>
+        
     </main>
+
+    <script>
+        // Función para abrir el panel del carrito
+        function openCart() {
+            document.getElementById('cart-panel').classList.add('open');
+        }
+
+        // Función para cerrar el panel del carrito
+        function closeCart() {
+            document.getElementById('cart-panel').classList.remove('open');
+        }
+
+        // Event listener para agregar al carrito y abrir el panel
+        document.addEventListener('htmx:afterRequest', function(evt) {
+            if (evt.detail.target.id === 'cart-items-panel') {
+                openCart(); // Abrir el carrito al agregar un producto
+                // Aquí podrías actualizar el total u otros elementos del carrito
+            }
+        });
+    </script>
 </body>
 </html>
