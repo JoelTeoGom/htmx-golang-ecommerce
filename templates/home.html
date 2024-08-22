@@ -8,26 +8,129 @@
     <link href="/static/css/styles.css" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@1.8.4"></script>
     
+    <style>
+        /* Dropdown Styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 8px;
+            padding: 10px;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .dropdown.show .dropdown-content {
+            display: block;
+            opacity: 1;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown-content p {
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white flex flex-col min-h-screen">
     <header class="text-center py-5 border-b border-gray-700">
         <div class="header-content max-w-7xl mx-auto flex justify-between items-center">
             <h1 class="text-3xl font-bold">Ecommerce</h1>
-            <div class="user-actions flex items-center space-x-4">
+            <div class="user-actions flex items-center space-x-8">
+                
                 {{if .IsAuthenticated}}
-                    <a href="/cart" class="relative">
+                    <!-- Cart Icon with label -->
+                    <a href="/cart" class="relative flex flex-col items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4L4 7M7 13l-1 5h11.6a2 2 0 002-2h-1a2 2 0 00-2-2H7zm-1 5a2 2 0 102 2 2 2 0 00-2-2zm10 0a2 2 0 102 2 2 2 0 00-2-2z"/>
                         </svg>
+                        <span class="text-sm text-white mt-1">CART</span>
                     </a>
-                    <p>Welcome, {{.Username}}</p>
-                    <a href="/logout">
-                        <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg flex items-center space-x-2">
-                            <span>Sign Out</span>
-                        </button>
-                    </a>
+
+                    <!-- Dropdown for User Account -->
+                    <div class="dropdown relative flex flex-col items-center" id="account-dropdown">
+                        <a href="#" class="relative flex flex-col items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14c1.656 0 3-1.344 3-3 0-1.656-1.344-3-3-3s-3 1.344-3 3c0 1.656 1.344 3 3 3zm0 2c-3.75 0-7 2.25-7 5v1h14v-1c0-2.75-3.25-5-7-5z"/>
+                            </svg>
+                            <span class="text-sm text-white mt-1">ACCOUNT</span>
+                        </a>
+                        <div class="dropdown-content mt-2 bg-white rounded-lg shadow-lg" id="dropdown-content">
+                            <p>Welcome, {{.Username}}</p>
+                            <a href="/invoices">My Invoices</a>
+                            <a href="#">Orders</a>
+                            <a href="#">Wishlist</a>
+                            <a href="#">Settings</a>
+                            <a href="/logout" class="text-red-600 font-bold">Logout</a>
+                        </div>
+                    </div>
+
+                    <!-- Alerts Icon with label -->
+                    <div class="text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-5-5.917V5a2 2 0 10-4 0v.083A6.002 6.002 0 004 11v3.159c0 .538-.214 1.055-.595 1.436L2 17h5m8 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <p class="text-xs mt-1">ALERTS</p>
+                    </div>
+
                 {{else}}
-                    <a href="/login"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Sign In</button></a>
+                    <!-- Cart Icon redirects to login -->
+                    <a href="/cart" class="relative flex flex-col items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4L4 7M7 13l-1 5h11.6a2 2 0 002-2h-1a2 2 0 00-2-2H7zm-1 5a2 2 0 102 2 2 2 0 00-2-2zm10 0a2 2 0 102 2 2 2 0 00-2-2z"/>
+                        </svg>
+                        <span class="text-sm text-white mt-1">CART</span>
+                    </a>
+
+                    <!-- Dropdown for User Account -->
+                    <div class="dropdown relative flex flex-col items-center" id="account-dropdown">
+                        <a href="#" class="relative flex flex-col items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14c1.656 0 3-1.344 3-3 0-1.656-1.344-3-3-3s-3 1.344-3 3c0 1.656 1.344 3 3 3zm0 2c-3.75 0-7 2.25-7 5v1h14v-1c0-2.75-3.25-5-7-5z"/>
+                            </svg>
+                            <span class="text-sm text-white mt-1">ACCOUNT</span>
+                        </a>
+                        <div class="dropdown-content mt-2 bg-white rounded-lg shadow-lg" id="dropdown-content">
+                            <p>Please Sign In</p>
+                            <a href="/login" class="bg-green-500 text-white text-center font-bold rounded-lg py-2">Sign In</a>
+                        </div>
+                    </div>
+
+                    <!-- Alerts Icon redirects to login -->
+                    <a href="/login" class="text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-5-5.917V5a2 2 0 10-4 0v.083A6.002 6.002 0 004 11v3.159c0 .538-.214 1.055-.595 1.436L2 17h5m8 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <p class="text-xs mt-1">ALERTS</p>
+                    </a>
                 {{end}}
             </div>
         </div>
@@ -82,6 +185,34 @@
     </footer>
 
     <script>
+        let dropdownTimer;
+
+        // Function to show the dropdown
+        function showDropdown() {
+            document.querySelector('.dropdown').classList.add('show');
+            clearTimeout(dropdownTimer);
+        }
+
+        // Function to hide the dropdown with fade out
+        function hideDropdown() {
+            dropdownTimer = setTimeout(function() {
+                const dropdownContent = document.querySelector('.dropdown-content');
+                dropdownContent.style.opacity = '0';
+                setTimeout(function() {
+                    document.querySelector('.dropdown').classList.remove('show');
+                    dropdownContent.style.opacity = '1';  // Reset opacity for next time
+                }, 500);  // Match this time with the transition duration in CSS
+            }, 2000);  // 2 seconds delay
+        }
+
+        // Show dropdown when hovering over ACCOUNT
+        document.querySelector('.dropdown').addEventListener('mouseenter', showDropdown);
+
+        // Hide dropdown when not hovering over it
+        document.querySelector('.dropdown-content').addEventListener('mouseleave', hideDropdown);
+
+
+
         // Function to open the cart panel
         function openCart() {
             document.getElementById('cart-panel').classList.add('open');
@@ -99,6 +230,8 @@
                 // You can update the total or other elements of the cart here
             }
         });
+
+
     </script>
 </body>
 </html>

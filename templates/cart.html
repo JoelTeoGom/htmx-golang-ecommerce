@@ -11,10 +11,7 @@
     <header class="text-center py-5">
         <div class="header-content max-w-7xl mx-auto flex justify-between items-center">
             <a href="/" class="flex items-center space-x-3">
-                <!-- Home icon to return to the homepage -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M13 5v6a2 2 0 002 2h6m-2 10H5a2 2 0 01-2-2V10a2 2 0 012-2h3m7-1v7a2 2 0 01-2 2H9m0 4h6a2 2 0 002-2v-7m0 7h4" />
-                </svg>
+
                 <h1 class="text-3xl font-bold">Your Cart</h1>
             </a>
             <div class="user-actions">
@@ -67,7 +64,7 @@
                 <h3 class="text-2xl font-semibold mb-4">Total: <span id="cart-total">{{.Total | printf "$%.2f"}}</span></h3>
                 <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
                     hx-post="/cart/checkout"
-                    hx-target="#cart-items"
+                    hx-target="main"
                     hx-swap="innerHTML"
                     hx-trigger="click"
                 >Proceed to Checkout</button>
