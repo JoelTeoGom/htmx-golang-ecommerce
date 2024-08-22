@@ -42,6 +42,7 @@ func main() {
 
 	http.HandleFunc("/cart/addHome", middleware.AuthMiddleware(handlers.AddToCartHomeHandler()))
 
+	http.HandleFunc("/invoices", middleware.AuthMiddleware(handlers.GetAllInvoiceByUser()))
 	// Inicio del servidor
 	log.Println("Servidor iniciado en :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

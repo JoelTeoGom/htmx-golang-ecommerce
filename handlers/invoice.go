@@ -8,76 +8,51 @@ import (
 )
 
 // Función para manejar el checkout y generar una factura
-func CheckoutAndCreateInvoice() http.HandlerFunc {
+func GetAllInvoiceByUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Get the user ID from the session
 		userID, err := GetUserIDFromCookie(r)
 		if err != nil || userID == 0 {
-			http.Error(w, "No se pudo obtener el usuario de la sesión", http.StatusUnauthorized)
+			http.Error(w, "Failed to retrieve user from session", http.StatusUnauthorized)
 			return
 		}
 
-		// Obtener los items del carrito antes de limpiar
-		cartItems, err := models.GetCartItems(database.DB, userID)
+		// Fetch all invoices for the user from the database
+		invoices, err := models.GetInvoicesByUserID(database.DB, userID)
 		if err != nil {
-			http.Error(w, "Error al obtener el carrito", http.StatusInternalServerError)
+			http.Error(w, "Failed to retrieve invoices", http.StatusInternalServerError)
 			return
 		}
 
-		// Calcular el total
-		var total float64
-		for _, item := range cartItems {
-			total += item.Product.Price * float64(item.Quantity)
-		}
-
-		// Crear la factura
-		invoiceID, err := models.CreateInvoice(database.DB, userID, total)
-		if err != nil {
-			http.Error(w, "Error al crear la factura", http.StatusInternalServerError)
-			return
-		}
-
-		// Añadir los productos a la factura
-		for _, item := range cartItems {
-			err = models.AddInvoiceItem(database.DB, invoiceID, item.ProductID, item.Quantity, item.Product.Price)
-			if err != nil {
-				http.Error(w, "Error al añadir productos a la factura", http.StatusInternalServerError)
-				return
-			}
-		}
-
-		// Limpiar el carrito
-		err = models.ClearCart(database.DB, userID)
-		if err != nil {
-			http.Error(w, "Error al limpiar el carrito", http.StatusInternalServerError)
-			return
-		}
-
-		// Obtener la factura recién creada y los productos asociados
-		invoice, err := models.GetInvoicesByUserID(database.DB, userID)
-		if err != nil {
-			http.Error(w, "Error al obtener la factura", http.StatusInternalServerError)
-			return
-		}
-
-		items, err := models.GetInvoiceItems(database.DB, invoiceID)
-		if err != nil {
-			http.Error(w, "Error al obtener los productos de la factura", http.StatusInternalServerError)
-			return
-		}
-
-		// Renderizar la plantilla de la factura
-		data := struct {
+		// Create a slice to hold the invoice data structures to pass to the template
+		var allInvoicesData []struct {
 			Invoice models.Invoice
 			Items   []models.InvoiceItem
-		}{
-			Invoice: invoice[0],
-			Items:   items,
 		}
 
-		tmpl := template.Must(template.ParseFiles("templates/invoice.html"))
-		err = tmpl.Execute(w, data)
+		// Loop through each invoice and get its items
+		for _, invoice := range invoices {
+			items, err := models.GetInvoiceItems(database.DB, invoice.ID)
+			if err != nil {
+				http.Error(w, "Failed to retrieve invoice items", http.StatusInternalServerError)
+				return
+			}
+
+			// Append the invoice and its items to the slice
+			allInvoicesData = append(allInvoicesData, struct {
+				Invoice models.Invoice
+				Items   []models.InvoiceItem
+			}{
+				Invoice: invoice,
+				Items:   items,
+			})
+		}
+
+		// Render the template with all invoices data
+		tmpl := template.Must(template.ParseFiles("templates/invoices.html"))
+		err = tmpl.Execute(w, allInvoicesData)
 		if err != nil {
-			http.Error(w, "Error al renderizar la plantilla de la factura", http.StatusInternalServerError)
+			http.Error(w, "Error rendering invoice template", http.StatusInternalServerError)
 		}
 	}
 }

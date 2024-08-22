@@ -3,102 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoices - Ecommerce</title>
+    <title>All Invoices</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
-    <link href="/static/css/styles.css" rel="stylesheet">
 </head>
-<body class="bg-gray-900 text-white flex flex-col min-h-screen">
-    <header class="text-center py-5 border-b border-gray-700">
-        <div class="header-content max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-3xl font-bold">Ecommerce</h1>
-            <div class="user-actions flex items-center space-x-4">
-                {{if .IsAuthenticated}}
-                    <a href="/cart" class="relative">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4L4 7M7 13l-1 5h11.6a2 2 0 002-2h-1a2 2 0 00-2-2H7zm-1 5a2 2 0 102 2 2 2 0 00-2-2zm10 0a2 2 0 102 2 2 2 0 00-2-2z"/>
-                        </svg>
-                    </a>
-                    <p>Welcome, {{.Username}}</p>
-                    <a href="/logout">
-                        <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg flex items-center space-x-2">
-                            <span>Sign Out</span>
-                        </button>
-                    </a>
-                {{else}}
-                    <a href="/login"><button class="btn bg-green-500 text-white py-2 px-4 rounded-lg">Sign In</button></a>
-                {{end}}
-            </div>
-        </div>
+<body class="bg-gray-900 text-white">
+    <header class="text-center py-5">
+        <h1 class="text-3xl font-bold">Your Invoices</h1>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow">
-        <h2 class="text-2xl font-semibold mb-6">Your Invoices</h2>
-
-        <div class="space-y-6">
-            {{range .Invoices}}
-            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h3 class="text-xl font-semibold text-white">Invoice #{{.ID}}</h3>
-                        <p class="text-gray-400">Date: {{.CreatedAt.Format "January 2, 2006"}}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-lg font-semibold text-green-500">Total: $<span class="invoice-total">{{.Total}}</span></p>
-                    </div>
-                </div>
-
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="border-b border-gray-600">
-                            <th class="py-2 text-gray-400">Product</th>
-                            <th class="py-2 text-gray-400">Quantity</th>
-                            <th class="py-2 text-gray-400">Price</th>
-                            <th class="py-2 text-gray-400">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{range .Items}}
-                        <tr>
-                            <td class="py-2">{{.Product.Name}}</td>
-                            <td class="py-2">{{.Quantity}}</td>
-                            <td class="py-2">${{.Price}}</td>
-                            <td class="py-2">${{.Price}}</td>
-                        </tr>
-                        {{end}}
-                    </tbody>
-                </table>
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-8">
+        {{range .}}
+        <div class="invoice-container bg-white text-gray-900 p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">Invoice #{{.Invoice.ID}} - Date: {{.Invoice.CreatedAt.Format "January 2, 2006"}}</h2>
+            <table class="table-auto w-full mb-4">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 text-left">Product</th>
+                        <th class="px-4 py-2 text-left">Quantity</th>
+                        <th class="px-4 py-2 text-left">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Items}}
+                    <tr>
+                        <td class="border px-4 py-2">{{.Product.Name}}</td>
+                        <td class="border px-4 py-2">{{.Quantity}}</td>
+                        <td class="border px-4 py-2">${{.Price}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+            <div class="text-right">
+                <strong>Total: ${{.Invoice.Total}}</strong>
             </div>
-            {{else}}
-            <p class="text-lg text-gray-300">You have no invoices yet.</p>
-            {{end}}
         </div>
+        {{else}}
+        <p class="text-lg">No invoices found.</p>
+        {{end}}
     </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-400 py-6 mt-8">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-gray-400 text-sm">© 2024 Ecommerce. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script>
-        // Function to calculate total for each invoice
-        function calculateInvoiceTotals() {
-            document.querySelectorAll('.invoice-total').forEach(function(totalElement) {
-                let total = 0;
-                const invoiceTable = totalElement.closest('.bg-gray-800').querySelector('tbody');
-                invoiceTable.querySelectorAll('tr').forEach(function(row) {
-                    const quantity = parseFloat(row.querySelector('td:nth-child(2)').textContent);
-                    const price = parseFloat(row.querySelector('td:nth-child(3)').textContent.replace('$', ''));
-                    total += quantity * price;
-                    row.querySelector('td:nth-child(4)').textContent = `$${(quantity * price).toFixed(2)}`;
-                });
-                totalElement.textContent = total.toFixed(2);
-            });
-        }
-
-        // Run the calculation on page load
-        document.addEventListener('DOMContentLoaded', calculateInvoiceTotals);
-    </script>
 </body>
 </html>
