@@ -122,6 +122,7 @@ func RemoveFromCartHandler() http.HandlerFunc {
 			http.Error(w, "No se pudo eliminar el producto del carrito", http.StatusInternalServerError)
 			return
 		}
+		w.Header().Set("HX-Trigger-After-Swap", "updateCart")
 	}
 }
 
@@ -143,6 +144,8 @@ func AddToCartHomeHandler() http.HandlerFunc {
 			return
 		}
 
+		//creara un evento updateCart
+		w.Header().Set("HX-Trigger-After-Swap", "updateCart")
 		// Ahora renderizamos el carrito para el home
 		RenderCartHome(w, r, userID)
 	}
@@ -244,6 +247,7 @@ func CheckoutCartHome() http.HandlerFunc {
 		// Determinar la plantilla a utilizar basado en la URL solicitada
 		var tmpl *template.Template
 		if r.URL.Path == "/cart/checkoutHome" {
+			w.Header().Set("HX-Trigger-After-Swap", "updateCart")
 			tmpl = template.Must(template.ParseFiles("templates/invoice.html"))
 		} else {
 			log.Println("sdfahjdshjfdsahjkfdshjkadfhsfhdjks")
@@ -256,5 +260,31 @@ func CheckoutCartHome() http.HandlerFunc {
 		if err != nil {
 			http.Error(w, "Error al renderizar la plantilla de la factura", http.StatusInternalServerError)
 		}
+	}
+}
+
+// CartCountHandler maneja la solicitud para obtener el número de ítems en el carrito
+func CartCountHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Obtener el ID del usuario desde la cookie JWT
+		userID, err := GetUserIDFromCookie(r)
+		if err != nil || userID == 0 {
+			// Si no hay usuario autenticado, devolver 0 como conteo del carrito
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("0"))
+			return
+		}
+
+		// Obtener el número de ítems en el carrito desde la base de datos
+		itemCount, err := models.GetCartItemCount(database.DB, userID)
+		if err != nil {
+			http.Error(w, "Error al obtener el conteo de ítems en el carrito", http.StatusInternalServerError)
+			return
+		}
+
+		// Devolver el número de ítems como texto simple
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(strconv.Itoa(itemCount)))
 	}
 }

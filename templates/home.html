@@ -67,12 +67,21 @@
             <div class="user-actions flex items-center space-x-8">
                 
                 {{if .IsAuthenticated}}
-                    <!-- Cart Icon with label -->
+                    <!-- Cart Icon with label and dynamic count -->
                     <a href="/cart" class="relative flex flex-col items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4L4 7M7 13l-1 5h11.6a2 2 0 002-2h-1a2 2 0 00-2-2H7zm-1 5a2 2 0 102 2 2 2 0 00-2-2zm10 0a2 2 0 102 2 2 2 0 00-2-2z"/>
                         </svg>
                         <span class="text-sm text-white mt-1">CART</span>
+                        
+                        <!-- Dynamic Cart Count -->
+                        <span id="cart-count" 
+                            class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                            hx-get="/api/cart-count" 
+                            hx-trigger="load, updateCart from:body" 
+                            hx-swap="innerHTML">
+                            0
+                        </span>
                     </a>
 
                     <!-- Dropdown for User Account -->

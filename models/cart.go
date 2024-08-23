@@ -76,3 +76,14 @@ func ClearCart(db *sql.DB, userID int) error {
 	_, err := db.Exec(query, userID)
 	return err
 }
+
+// GetCartItemCount obtiene el número total de ítems en el carrito de un usuario
+func GetCartItemCount(db *sql.DB, userID int) (int, error) {
+	var totalQuantity int
+	query := "SELECT COALESCE(SUM(quantity), 0) FROM carts WHERE user_id = $1"
+	err := db.QueryRow(query, userID).Scan(&totalQuantity)
+	if err != nil {
+		return 0, err
+	}
+	return totalQuantity, nil
+}
