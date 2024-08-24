@@ -9,7 +9,7 @@ import (
 
 var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
-func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func LogAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Leer la cookie "token"
 		cookie, err := r.Cookie("token")
@@ -37,6 +37,31 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		// Si ya está en la página principal (/), simplemente continuar
+		next.ServeHTTP(w, r)
+	}
+}
+
+func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Leer la cookie "token"
+		cookie, err := r.Cookie("token")
+		if err != nil || cookie.Value == "" {
+			// Si no hay cookie o está vacía, devolver un error 401 Unauthorized
+			http.Error(w, "Unauthorized: No valid token provided dsfadfdsdfsdsf", http.StatusUnauthorized)
+			return
+		}
+
+		// Verificar y analizar el token JWT
+		token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
+			return jwtKey, nil
+		})
+
+		if err != nil || !token.Valid {
+			// Si el token es inválido, devolver un error 401 Unauthorized
+			http.Error(w, "Unauthorized: Invalid token afsddfasfdsasdfadfsafsdafsdafds", http.StatusUnauthorized)
+			return
+		}
+
 		next.ServeHTTP(w, r)
 	}
 }

@@ -20,8 +20,8 @@ func main() {
 	// Configuración de rutas
 
 	// Aplicar el middleware a las rutas protegidas
-	http.HandleFunc("/login", middleware.AuthMiddleware(handlers.LoginHandler()))
-	http.HandleFunc("/register", middleware.AuthMiddleware(handlers.RegisterHandler()))
+	http.HandleFunc("/login", middleware.LogAuthMiddleware(handlers.LoginHandler()))
+	http.HandleFunc("/register", middleware.LogAuthMiddleware(handlers.RegisterHandler()))
 	http.HandleFunc("/", handlers.HomeHandler())
 	http.HandleFunc("/logout", handlers.LogoutHandler())
 

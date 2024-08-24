@@ -13,7 +13,12 @@
     <div class="min-h-screen flex items-center justify-center">
         <div class="bg-gray-800 p-12 rounded-lg shadow-lg max-w-lg w-full">
             <h2 class="text-3xl font-bold mb-8 text-center">Iniciar Sesión</h2>
-            <form hx-post="/login" hx-target="#message-container" hx-swap="innerHTML">
+            <form 
+            hx-post="/login" 
+            hx-target="#message-container" 
+            hx-swap="innerHTML"
+            hx-push-url="true"
+            >
                 <div class="mb-6">
                     <label for="username" class="block text-lg font-medium">Usuario:</label>
                     <input type="text" id="username" name="username" required class="w-full p-4 bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:border-green-500">
