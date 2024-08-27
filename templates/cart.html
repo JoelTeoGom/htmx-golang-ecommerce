@@ -11,8 +11,6 @@
     <header class="text-center py-5">
         <div class="header-content max-w-7xl mx-auto flex justify-between items-center">
             <a href="/" class="flex items-center space-x-3">
-
-
                 <h1 class="text-3xl font-bold">Your Cart</h1>
             </a>
             <div class="user-actions">
@@ -26,51 +24,77 @@
         </div>
     </header>
     
-        <main class="max-w-7xl mx-auto px-4 py-6">
-            <h2 class="text-2xl font-semibold mb-6">Cart Summary</h2>
-            <div id="cart-items" class="space-y-6">
-                {{range .CartItems}}
-                <div id="cart-item-{{.ProductID}}" data-price="{{.Product.Price}}" data-quantity="{{.Quantity}}">
-                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="w-24 h-24 object-cover rounded-lg">
-                            <div>
-                                <p class="text-xl font-semibold text-white">{{.Product.Name}}</p>
-                                <p class="text-lg text-gray-300">{{.Quantity}} x {{.Product.Price | printf "$%.2f"}}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <button 
-                                hx-post="/cart/remove" 
-                                hx-vals='{"id": {{.ProductID}} }' 
-                                hx-target="#cart-item-{{.ProductID}}" 
-                                hx-swap="delete" 
-                                hx-trigger="click"
-                                class="bg-red-600 text-white p-2 rounded-lg hover:bg-red-700"
-                                >
-                                <!-- Stylized trash icon, larger and black -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5-4h4m-4 0a2 2 0 00-2 2v1h8V5a2 2 0 00-2-2m-4 0h4" />
-                                </svg>
-                            </button>
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <h2 class="text-2xl font-semibold mb-6">Cart Summary</h2>
+        <div id="cart-items" class="space-y-6">
+            {{range .CartItems}}
+            <div id="cart-item-{{.ProductID}}" data-price="{{.Product.Price}}" data-quantity="{{.Quantity}}">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <img src="{{.Product.ImageURL}}" alt="{{.Product.Name}}" class="w-24 h-24 object-cover rounded-lg">
+                        <div>
+                            <p class="text-xl font-semibold text-white">{{.Product.Name}}</p>
+                            <p class="text-lg text-gray-300">{{.Quantity}} x {{.Product.Price | printf "$%.2f"}}</p>
                         </div>
                     </div>
+                    <div class="flex items-center space-x-4">
+                        <!-- Quantity adjustment buttons -->
+                        <button 
+                            class="bg-gray-600 text-white p-2 rounded-lg hover:bg-gray-700"
+                            hx-post="/cart/decrease" 
+                            hx-vals='{"id": {{.ProductID}} }' 
+                            hx-target="#cart-item-{{.ProductID}}" 
+                            hx-swap="innerHTML"
+                            hx-trigger="click"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                            </svg>
+                        </button>
+                        <button 
+                            class="bg-gray-600 text-white p-2 rounded-lg hover:bg-gray-700"
+                            hx-post="/cart/increase" 
+                            hx-vals='{"id": {{.ProductID}} }' 
+                            hx-target="#cart-item-{{.ProductID}}" 
+                            hx-swap="innerHTML"
+                            hx-trigger="click"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+                        <!-- Remove button -->
+                        <button 
+                            hx-post="/cart/remove" 
+                            hx-vals='{"id": {{.ProductID}} }' 
+                            hx-target="#cart-item-{{.ProductID}}" 
+                            hx-swap="delete" 
+                            hx-trigger="click"
+                            class="bg-red-600 text-white p-2 rounded-lg hover:bg-red-700"
+                        >
+                            <!-- Stylized trash icon, larger and black -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5-4h4m-4 0a2 2 0 00-2 2v1h8V5a2 2 0 00-2-2m-4 0h4" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                {{else}}
-                <p class="text-lg text-gray-300">Your cart is empty.</p>
-                {{end}}
             </div>
-            
-            <div class="mt-10">
-                <h3 class="text-2xl font-semibold mb-4">Total: <span id="cart-total">{{.Total | printf "$%.2f"}}</span></h3>
-                <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
-                    hx-post="/cart/checkout"
-                    hx-target="main"
-                    hx-swap="innerHTML"
-                    hx-trigger="click"
-                >Proceed to Checkout</button>
-            </div>
-        </main>
+            {{else}}
+            <p class="text-lg text-gray-300">Your cart is empty.</p>
+            {{end}}
+        </div>
+        
+        <div class="mt-10">
+            <h3 class="text-2xl font-semibold mb-4">Total: <span id="cart-total">{{.Total | printf "$%.2f"}}</span></h3>
+            <button class="btn bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
+                hx-post="/cart/checkout"
+                hx-target="main"
+                hx-swap="innerHTML"
+                hx-trigger="click"
+            >Proceed to Checkout</button>
+        </div>
+    </main>
 
     <script>
         // Function to recalculate the cart total

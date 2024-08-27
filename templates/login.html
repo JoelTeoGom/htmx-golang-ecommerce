@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,8 @@
 <body class="bg-gray-900 text-white">
     <div class="min-h-screen flex items-center justify-center">
         <div class="bg-gray-800 p-12 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 class="text-3xl font-bold mb-8 text-center">Iniciar Sesión</h2>
+            <h2 class="text-3xl font-bold mb-8 text-center">Log In</h2>
+            <p class="text-center mb-4">Please enter your credentials</p>
             <form 
             hx-post="/login" 
             hx-target="#message-container" 
@@ -20,26 +21,30 @@
             hx-push-url="true"
             >
                 <div class="mb-6">
-                    <label for="username" class="block text-lg font-medium">Usuario:</label>
+                    <label for="username" class="block text-lg font-medium">Username:</label>
                     <input type="text" id="username" name="username" required class="w-full p-4 bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:border-green-500">
                 </div>
 
                 <div class="mb-8">
-                    <label for="password" class="block text-lg font-medium">Contraseña:</label>
+                    <label for="password" class="block text-lg font-medium">Password:</label>
                     <input type="password" id="password" name="password" required class="w-full p-4 bg-gray-700 rounded-lg border border-gray-600 focus:outline-none focus:border-green-500">
                 </div>
 
+                <div class="mb-4 text-center">
+                    <a href="#" class="text-green-400 hover:text-green-500 underline">Forgot your password?</a>
+                </div>
+
                 <button type="submit" class="w-full bg-green-500 text-white py-3 px-4 rounded-lg text-lg transition-colors duration-300 hover:bg-green-600">
-                    Iniciar Sesión
+                    Log In
                 </button>
             </form>
 
             <div id="message-container" class="mt-6">
-                <!-- Aquí aparecerán los mensajes después de la autenticación -->
+                <!-- Messages will appear here after authentication -->
             </div>
 
             <div class="mt-6 text-center">
-                <p>¿No tienes una cuenta? <a href="/register" class="text-green-400 hover:text-green-500">Regístrate aquí</a></p>
+                <p>Don't have an account? <a href="/register" class="text-green-400 hover:text-green-500">Sign up here</a></p>
             </div>
         </div>
     </div>
